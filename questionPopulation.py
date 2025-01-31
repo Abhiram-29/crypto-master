@@ -1,59 +1,110 @@
+from pydantic import BaseModel, Field, field_validator, model_validator
+from typing import Optional, List, Literal
 from dotenv import load_dotenv
+import json
 import os
-from pymongo import MongoClient
-from pydantic import BaseModel,Field,field_validator
-from typing import Optional,List
+import asyncio
+from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.server_api import ServerApi
 
+load_dotenv()
 
 class BaseQuestion(BaseModel):
-    question_id : int = Field(...,alias="_id")
-    topic : str
-    difficulty : str = Field(..., pattern="^(easy|medium|hard|jackpot)$")
-    hint : Optional[str]
-    question_type : str
+    question_id: int = Field(..., alias="_id")
+    topic: str
+    difficulty: str = Field(..., pattern="^(easy|medium|hard|jackpot)$")
+    hint: Optional[str]
+    question_type: str
 
-class MCQ(BaseModel):
+class MCQ(BaseQuestion):
     question_type: Literal['mcq'] = 'mcq'
     question: str
     options: List[str] = Field(..., min_items=4, max_items=4)
     correct_ans: str
 
-    @field_validator("correct_ans", mode="after")
-    @classmethod
-    def is_correct(cls, value: str, values: dict) -> str:
-        options = values.get("options", [])
-        if value not in options:
+    @model_validator(mode='after')
+    def validate_correct_answer(self) -> 'MCQ':
+        if self.correct_ans not in self.options:
             raise ValueError("correct_ans must be one of the provided options")
-        return value
+        return self
 
-class FillInTheBlanks(BaseModel):
+class FillInTheBlanks(BaseQuestion):
     question_type: Literal['fib'] = 'fib'
-    question : str
-    correct_ans : str
-
+    question: str
+    correct_ans: str
 
 class MCQWithImage(BaseQuestion):
-    question_type : Literal['mcq_image'] =  'mcq_image'
-    question : str
-    options : List[str] = Field(...,min_items = 4,max_items = 4)
-    correct_ans : int = Field(...,gt=0,lt=5)
+    question_type: Literal['mcq_image'] = 'mcq_image'
+    question: str
+    options: List[str] = Field(..., min_items=4, max_items=4)
+    correct_ans: int = Field(..., gt=0, lt=5)
 
 class Wordle(BaseQuestion):
-    question_type : Literal['wordle'] = 'wordle'
-    word : str = Field(...,min_length = 5, max_length = 5)
+    question_type: Literal['wordle'] = 'wordle'
+    word: str = Field(..., min_length=4, max_length=5)
 
 
 
+sample_mcqs = [{"_id": 1,"topic": "Python",
+        "difficulty": "medium",
+        "hint": "Think about data types",
+        "question": "What is the output of type(1/2) in Python 3?",
+        "options": ["int", "float", "double", "decimal"],
+        "correct_ans": "float"
+    }]
 
+async def validate_mcq(json_objects: List[dict]) -> List[MCQ]:
+    """Validate JSON objects against the Pydantic model."""
+    validated_objects = []
+    for idx, obj in enumerate(json_objects):
+        try:
+            validated_obj = MCQ(**obj)
+            validated_objects.append(validated_obj)
+        except ValidationError as e:
+            print(f"Validation error in object {idx + 1}:")
+            print(e.json())
+            continue
+    return validated_objects
 
+async def upload_to_mongodb(validated_objects: List[MCQ],
+                          mongodb_uri: str,
+                          database_name: str,
+                          collection_name: str):
+    try:
+        # Create MongoDB client
+        client = AsyncIOMotorClient(mongodb_uri)
+        db = client[database_name]
+        collection = db[collection_name]
 
-# load_dotenv()
-# conn_uri = os.getenv("CONNECTION_STRING")
+        # Convert Pydantic models to dictionaries and insert
+        documents = [obj.dict() for obj in validated_objects]
+        if documents:
+            result = await collection.insert_many(documents)
+            print(f"Successfully inserted {len(result.inserted_ids)} documents")
+        else:
+            print("No valid documents to insert")
 
-# client = MongoClient(conn_uri)
+    except Exception as e:
+        print(f"Error uploading to MongoDB: {str(e)}")
+    finally:
+        client.close()
 
-# try:
-#     database = client.get_database("CryptoMaster")
-#     print("HELLO")
-# except Exception as e:
-#     print(e)
+async def main():
+    MONGODB_URI = os.getenv("CONNECTION_STRING")
+    DATABASE_NAME = "CryptoMaster"
+    COLLECTION_NAME = "Questions"
+
+    try:
+        validated_objects = await validate_mcq(sample_mcqs)
+        print(f"Successfully validated {len(validated_objects)} objects")
+
+        await upload_to_mongodb(validated_objects,
+                              MONGODB_URI,
+                              DATABASE_NAME,
+                              COLLECTION_NAME)
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
