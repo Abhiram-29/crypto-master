@@ -1,9 +1,0 @@
-{
-        "_id": 1,
-        "topic": "Python",
-        "difficulty": "medium",
-        "hint": "Think about data types",
-        "question": "What is the output of type(1/2) in Python 3?",
-        "options": ["int", "float", "double", "decimal"],
-        "correct_ans": "float"
-    }

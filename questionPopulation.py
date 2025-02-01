@@ -6,46 +6,10 @@ import os
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
-
+from models import MCQ, MCQWithImage, FillInTheBlanks
 load_dotenv()
 
-class BaseQuestion(BaseModel):
-    question_id: int = Field(..., alias="_id")
-    topic: str
-    difficulty: str = Field(..., pattern="^(easy|medium|hard|jackpot)$")
-    hint: Optional[str]
-    question_type: str
-
-class MCQ(BaseQuestion):
-    question_type: Literal['mcq'] = 'mcq'
-    question: str
-    options: List[str] = Field(..., min_items=4, max_items=4)
-    correct_ans: str
-
-    @model_validator(mode='after')
-    def validate_correct_answer(self) -> 'MCQ':
-        if self.correct_ans not in self.options:
-            raise ValueError("correct_ans must be one of the provided options")
-        return self
-
-class FillInTheBlanks(BaseQuestion):
-    question_type: Literal['fib'] = 'fib'
-    question: str
-    correct_ans: str
-
-class MCQWithImage(BaseQuestion):
-    question_type: Literal['mcq_image'] = 'mcq_image'
-    question: str
-    options: List[str] = Field(..., min_items=4, max_items=4)
-    correct_ans: int = Field(..., gt=0, lt=5)
-
-class Wordle(BaseQuestion):
-    question_type: Literal['wordle'] = 'wordle'
-    word: str = Field(..., min_length=4, max_length=5)
-
-
-
-sample_mcqs = [{"_id": 1,"topic": "Python",
+sample_mcqs = [{"_id": 2,"topic": "Python",
         "difficulty": "medium",
         "hint": "Think about data types",
         "question": "What is the output of type(1/2) in Python 3?",
