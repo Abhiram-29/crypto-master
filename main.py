@@ -9,11 +9,23 @@ from pymongo.server_api import ServerApi
 from models import MCQ, MCQWithImage, FillInTheBlanks
 import random
 from datetime import datetime,timedelta
+from pydantic import BaseModel,Field
+
+class updateParameters(BaseModel):
+    user_id : str
+    question_id : int
+    spent_amt : int
+    winning_amt : int
+    difficulty : str = Field(..., pattern="^(easy|medium|hard|jackpot)$")
+    timestamp : datetime
+    user_start_time : datetime
+    solved : bool
 
 app = FastAPI()
 
 MONGO_URI = os.getenv("CONNECTION_STRING")
 Game_Duration = 30 #in minutes
+Winnings = {"easy": 0.20, "medium": 0.40, "hard": 0.80, "jackpot":2.00}
 
 class MongoDB:
     client: AsyncIOMotorClient = None
@@ -84,5 +96,41 @@ async def login(user_id,db: AsyncIOMotorDatabase = Depends(get_database)):
             return {"success":False,"message": "User has played the game"}
 
 
+@app.post("/update")
+async def updateScore(params: updateParameters, db : AsyncIOMotorDatabase = Depends(get_database)):
+    '''
+        {
+            sucesss : True/False
+            message : string
+            coins : total number of coins (int)
+        }
+    '''
+    user = await db.Users.find_one({"user_id" : params.user_id})
 
+    if (params.timestamp - params.user_start_time) > timedelta(minutes= 30):
+        return {
+            "success" : False,
+            "message" : "user submitted the question after the deadline",
+            "coins" : user.get("coins")
+        }
+    print(params.solved)
+    print(user.get("coins"))
+    message = ""
+    updated_coins = 0
+    if params.solved != True:
+        updated_coins = user.get("coins")-params.spent_amt
+        message = f"the user lost {params.spent_amt} coins"
+    else:
+        updated_coins = user.get("coins") + params.spent_amt*(Winnings[params.difficulty])
+        message = f"the user won {updated_coins - params.spent_amt} coins"
+    print(updated_coins)
+    await db.Users.update_one(
+            {"user_id" : params.user_id},
+            {"$set":{"coins": updated_coins} }
+        )
+    return {
+            "success" : True,
+            "message" : "user lost {params.spent_amt} coins",
+            "coins" : updated_coins
+        }
 
