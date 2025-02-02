@@ -10,7 +10,7 @@ import os
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient,AsyncIOMotorDatabase
 from pymongo.server_api import ServerApi
-from models import MCQ, MCQWithImage, FillInTheBlanks
+from models import *
 import random
 from datetime import datetime,timedelta
 from pydantic import BaseModel,Field
@@ -21,21 +21,6 @@ import bisect
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-class updateParameters(BaseModel):
-    user_id : str
-    question_id : int
-    spent_amt : int
-    winning_amt : int
-    difficulty : str = Field(..., pattern="^(easy|medium|hard|jackpot)$")
-    timestamp : datetime
-    user_start_time : datetime
-    solved : bool
-
-class endParameters(BaseModel):
-    user_id : str
-    end_time : datetime
-    coins : int
 
 app = FastAPI()
 
@@ -244,7 +229,8 @@ async def displayLeaderboard(
 async def gameEnd(
     request : Request,
     params : endParameters,
-    db : AsyncIOMotorDatabase = Depends(get_database)
+    db : AsyncIOMotorDatabase = Depends(get_database),
+    api_key : str  = Depends(verifyApiKey)
 ):
     user = await db.Users.find_one({"user_id" : params.user_id})
     LeaderBoard.update(params.user_id,user.get('coins'))

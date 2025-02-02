@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import Optional, List, Literal
+from datetime import datetime
 
 class BaseQuestion(BaseModel):
     question_id: int = Field(..., alias="_id")
@@ -34,3 +35,19 @@ class MCQWithImage(BaseQuestion):
 class Wordle(BaseQuestion):
     question_type: Literal['wordle'] = 'wordle'
     word: str = Field(..., min_length=4, max_length=5)
+
+
+class updateParameters(BaseModel):
+    user_id : str
+    question_id : int
+    spent_amt : int
+    winning_amt : int
+    difficulty : str = Field(..., pattern="^(easy|medium|hard|jackpot)$")
+    timestamp : datetime
+    user_start_time : datetime
+    solved : bool
+
+class endParameters(BaseModel):
+    user_id : str
+    end_time : datetime
+    coins : int
