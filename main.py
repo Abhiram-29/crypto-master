@@ -16,6 +16,7 @@ from datetime import datetime,timedelta
 from pydantic import BaseModel,Field
 from starlette.status import HTTP_403_FORBIDDEN
 import logging
+import bisect
 
 
 logging.basicConfig(level=logging.INFO)
@@ -30,6 +31,11 @@ class updateParameters(BaseModel):
     timestamp : datetime
     user_start_time : datetime
     solved : bool
+
+class endParameters(BaseModel):
+    user_id : str
+    end_time : datetime
+    coins : int
 
 app = FastAPI()
 
@@ -46,6 +52,7 @@ limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded,_rate_limit_exceeded_handler)
 
+LeaderBoard = []
 
 async def verifyApiKey(api_key_header: str = Security(api_key_header)):
 
@@ -80,15 +87,45 @@ class MongoDB:
         if cls.client:
             cls.client.close()
 
+class LeaderBoard:
+    leader_board = []
+
+    @classmethod
+    def initialize_leaderboard(cls,users):
+        for user in users:
+            cls.leader_board.append((user.get("coins"),user.get("user_id")))
+        cls.leader_board.sort(key = lambda x : -x[0])
+    
+    @classmethod
+    def update(cls, user_id, score):
+        for i, entry in enumerate(cls.leader_board):
+            if entry[1] == user_id:
+                cls.leader_board.pop(i)
+                break
+        new_entry = (score, user_id)
+        index = bisect.insort_right(cls.leader_board, new_entry, key=lambda x: -x[0])
+        # cls.leader_board.insert(index, new_entry)
+
+    @classmethod
+    def showLeaderboard(cls):
+        return leader_board
+
+
 async def get_database():
     if MongoDB.db is None:
         await MongoDB.connect()
     return MongoDB.db
 
 
+async def initialize_leaderboad():
+    db = await get_database()
+    users = await db.Users.find().to_list()
+    LeaderBoard.initialize_leaderboard(users)
+
 @app.on_event("startup")
 async def startup_db():
     await MongoDB.connect()
+    await initialize_leaderboad()
 
 @app.on_event("shutdown")
 async def shutdown_db():
@@ -191,10 +228,29 @@ async def updateScore(
         }
 
 
-# @app.get("/leaderboad")
-# maintain a sorted array in the database. I don't think we need to overcomplicate this
-# use binary search to locate where you would insert the new score
-# add an app.gameend endpoint that will update this array
-# array will contain user_id : score in order of score
-# the leaderboad endpoint will be used to display the leaderboard
-# the gameend endpoint  will be used to update  the leadboard
+@app.get("/leaderboard")
+@limiter.limit("5/minute")
+async def displayLeaderboard(
+    request: Request,
+    api_key : str = Depends(verifyApiKey)
+):
+    if LeaderBoard.leader_board is None:
+        await initialize_leaderboad()
+    return LeaderBoard.leader_board
+
+
+@app.post("/end")
+@limiter.limit("30/second")
+async def gameEnd(
+    request : Request,
+    params : endParameters,
+    db : AsyncIOMotorDatabase = Depends(get_database)
+):
+    user = await db.Users.find_one({"user_id" : params.user_id})
+    LeaderBoard.update(params.user_id,user.get('coins'))
+    await db.Users.update_one(
+        {"user_id" : params.user_id},
+        {"$set" : {"end_time" : datetime.utcnow() } }
+    )
+
+    return {"success" : True,"Final coin tally":user.get("coins")}
