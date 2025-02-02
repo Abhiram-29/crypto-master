@@ -1,5 +1,8 @@
-from fastapi import FastAPI, APIRouter, Depends,  Security, HTTPException
+from fastapi import FastAPI, APIRouter, Depends,  Security, HTTPException, Request
 from fastapi.security.api_key import APIKeyHeader
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from typing import Optional, List, Literal
 from dotenv import load_dotenv
 import json
@@ -13,6 +16,7 @@ from datetime import datetime,timedelta
 from pydantic import BaseModel,Field
 from starlette.status import HTTP_403_FORBIDDEN
 import logging
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -37,6 +41,10 @@ Winnings = {"easy": 0.20, "medium": 0.40, "hard": 0.80, "jackpot":2.00}
 
 
 api_key_header = APIKeyHeader(name=API_KEY_NAME,auto_error= True)
+
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded,_rate_limit_exceeded_handler)
 
 
 async def verifyApiKey(api_key_header: str = Security(api_key_header)):
@@ -93,7 +101,9 @@ def serialize_document(doc):
     return doc
 
 @app.get("/questions/{user_id}")
+@limiter.limit("3/second")
 async def sendQuestions(
+    request: Request,
     user_id: str,
     db: AsyncIOMotorDatabase = Depends(get_database),
     api_key : str = Depends(verifyApiKey)
@@ -107,7 +117,9 @@ async def greet():
     return "API is running"
 
 @app.get("/login/{user_id}")
+@limiter.limit("5/second")
 async def login(
+    request : Request,
     user_id,
     db: AsyncIOMotorDatabase = Depends(get_database),
     api_key : str = Depends(verifyApiKey)
@@ -135,7 +147,9 @@ async def login(
 
 
 @app.post("/update")
+@limiter.limit("30/second")
 async def updateScore(
+    request : Request,
     params: updateParameters,
     db : AsyncIOMotorDatabase = Depends(get_database),
     api_key : str = Depends(verifyApiKey)
