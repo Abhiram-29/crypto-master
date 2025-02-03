@@ -7,22 +7,40 @@ import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
 from models import MCQ, MCQWithImage, FillInTheBlanks
+from pydantic import ValidationError
 load_dotenv()
 
 sample_mcqs = [{"_id": 2,"topic": "Python",
-        "difficulty": "medium",
+        "difficulty": "hard",
         "hint": "Think about data types",
         "question": "What is the output of type(1/2) in Python 3?",
         "options": ["int", "float", "double", "decimal"],
         "correct_ans": "float"
     }]
 
+sample_blanks = [{
+    "_id": 3,"topic" : "Java",
+    "difficulty" : "hard",
+    "hint" : "Bunk",
+    "question":"Did you watch pushpa 2",
+    "correct_ans" : "yes"
+}]
+
+sample_image_mcq = [{
+    "_id": 4,"topic" : "HTML",
+    "difficulty" : "hard",
+    "hint" : "it's not a programming language",
+    "question":"https://www.indiabix.com/_files/images/verbal-reasoning/dice/4-13-1-4.png",
+    "options" : ["@","$","()","#"],
+    "correct_ans" : 1
+}]
+
 async def validate_mcq(json_objects: List[dict]) -> List[MCQ]:
     """Validate JSON objects against the Pydantic model."""
     validated_objects = []
     for idx, obj in enumerate(json_objects):
         try:
-            validated_obj = MCQ(**obj)
+            validated_obj = FillInTheBlanks(**obj)
             validated_objects.append(validated_obj)
         except ValidationError as e:
             print(f"Validation error in object {idx + 1}:")
@@ -56,10 +74,10 @@ async def upload_to_mongodb(validated_objects: List[MCQ],
 async def main():
     MONGODB_URI = os.getenv("CONNECTION_STRING")
     DATABASE_NAME = "CryptoMaster"
-    COLLECTION_NAME = "Questions"
+    COLLECTION_NAME = "Hard"
 
     try:
-        validated_objects = await validate_mcq(sample_mcqs)
+        validated_objects = await validate_mcq(sample_blanks)
         print(f"Successfully validated {len(validated_objects)} objects")
 
         await upload_to_mongodb(validated_objects,
@@ -71,4 +89,5 @@ async def main():
         print(f"Error: {str(e)}")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    for i in range(15):
+        asyncio.run(main())

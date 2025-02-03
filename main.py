@@ -122,30 +122,44 @@ def serialize_document(doc):
     doc["_id"] = str(doc["_id"])  # Convert ObjectId to string
     return doc
 
-@app.get("/questions/{user_id}")
-@limiter.limit("3/second")
+class UserRequest(BaseModel):
+    user_id: str
+
+@app.post("/questions")
+@limiter.limit("20/second")
 async def sendQuestions(
     request: Request,
-    user_id: str,
+    question_request = UserRequest,
     db: AsyncIOMotorDatabase = Depends(get_database),
     api_key : str = Depends(verifyApiKey)
 ):
-    questions = await db.Questions.find().to_list()
-    questions = [serialize_document(q) for q in questions]
+
+    easy_questions = await db.Easy.find().to_list()
+    easy_questions = random.sample([serialize_document(q) for q in easy_questions],min(len(easy_questions),15))
+    medium_questions = await db.Medium.find().to_list()
+    medium_questions = random.sample([serialize_document(q) for q in medium_questions],min(len(medium_questions),15))
+    hard_questions = await db.Hard.find().to_list()
+    hard_questions = random.sample([serialize_document(q) for q in hard_questions],min(len(hard_questions),10))
+
+    questions = [*easy_questions,*medium_questions,*hard_questions]
     return random.sample(questions,min(len(questions),30))
 
 @app.get("/")
 async def greet():
     return "API is running"
 
-@app.get("/login/{user_id}")
-@limiter.limit("5/second")
+@app.post("/login")
+@limiter.limit("20/second")
 async def login(
     request : Request,
-    user_id,
+    login_request : UserRequest,
     db: AsyncIOMotorDatabase = Depends(get_database),
     api_key : str = Depends(verifyApiKey)
 ):
+    user_id = login_request.user_id
+    if user_id != "ABCD123":
+        print(user_id)
+        return
     user = await db.Users.find_one({"user_id" : user_id})
     if not user:
         return {"success" : False, "message":"User not found"}
