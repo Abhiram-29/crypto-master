@@ -157,9 +157,6 @@ async def login(
     api_key : str = Depends(verifyApiKey)
 ):
     user_id = login_request.user_id
-    if user_id != "ABCD123":
-        print(user_id)
-        return
     user = await db.Users.find_one({"user_id" : user_id})
     if not user:
         return {"success" : False, "message":"User not found"}
@@ -170,16 +167,17 @@ async def login(
         {"user_id": user_id},
         {"$set": {
             "start_time": datetime.utcnow(),
-            "logged_in": "True"
+            "logged_in": "True",
+            "questions_solved" : []
         }},
         upsert=False
     )
-        return {"success" : True,"message": "User loggedin for the first time"}
+        return {"success" : True,"message": "User loggedin for the first time", "name" : user.get("name"),"email_id":user.get("email_id"),"questions_solved" : user.get("questions_solved")}
     else:
         if (datetime.utcnow()- start_time) < timedelta(minutes= Game_Duration):
-            return {"success" : True, "message": "User logged in again"}
+            return {"success" : True, "message": "User logged in again","name" : user.get("name"),"email_id":user.get("email_id"),"questions_solved" : user.get("questions_solved")}
         else:
-            return {"success":False,"message": "User has played the game"}
+            return {"success":False,"message": "User has played the game","name" : user.get("name"),"email_id":user.get("email_id"),"questions_solved" : user.get("questions_solved")}
 
 
 @app.post("/update")
