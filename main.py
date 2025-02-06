@@ -175,16 +175,13 @@ async def login(
         upsert=True
     )
         message = "User loggedin for the first time"
-        # return {"success" : True,"message": , "name" : user.get("name"),"email_id":user.get("email_id"),"questions_attempted" : user.get("questions_attempted")}
     else:
         if (datetime.utcnow()- start_time) < timedelta(minutes= Game_Duration):
             message = "User logged in again"
-            # return {"success" : True, ,"name" : user.get("name"),"email_id":user.get("email_id"),"questions_attempted" : user.get("questions_attempted")}
         else:
             message = "User has played the game"
             success = False
-            # return {"success":False,"message": ,"name" : user.get("name"),"email_id":user.get("email_id"),"questions_attempted" : user.get("questions_attempted")}
-    return {"success": success,"message": message,"name": user.get("name"),"email_id":user.get("email_id"),"coins":user.get("coins"),"start_time":user.get("start_time"),"questions_attempted": user.get("questions_attempted")}
+    return {"success": success,"message": message,"name": user.get("name"),"email_id":user.get("email_id"),"coins":user.get("coins"),"time_left": 1500,"questions_attempted": user.get("questions_attempted")}
 
 @app.post("/update")
 @limiter.limit("30/second")
