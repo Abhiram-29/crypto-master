@@ -168,16 +168,16 @@ async def login(
         {"$set": {
             "start_time": datetime.utcnow(),
             "logged_in": "True",
-            "questions_solved" : []
+            "questions_attempted" : []
         }},
-        upsert=False
+        upsert=True
     )
-        return {"success" : True,"message": "User loggedin for the first time", "name" : user.get("name"),"email_id":user.get("email_id"),"questions_solved" : user.get("questions_solved")}
+        return {"success" : True,"message": "User loggedin for the first time", "name" : user.get("name"),"email_id":user.get("email_id"),"questions_attempted" : user.get("questions_attempted")}
     else:
         if (datetime.utcnow()- start_time) < timedelta(minutes= Game_Duration):
-            return {"success" : True, "message": "User logged in again","name" : user.get("name"),"email_id":user.get("email_id"),"questions_solved" : user.get("questions_solved")}
+            return {"success" : True, "message": "User logged in again","name" : user.get("name"),"email_id":user.get("email_id"),"questions_attempted" : user.get("questions_attempted")}
         else:
-            return {"success":False,"message": "User has played the game","name" : user.get("name"),"email_id":user.get("email_id"),"questions_solved" : user.get("questions_solved")}
+            return {"success":False,"message": "User has played the game","name" : user.get("name"),"email_id":user.get("email_id"),"questions_attempted" : user.get("questions_attempted")}
 
 
 @app.post("/update")
@@ -189,13 +189,6 @@ async def updateScore(
     db : AsyncIOMotorDatabase = Depends(get_database),
     api_key : str = Depends(verifyApiKey)
     ):
-    '''
-        {
-            sucesss : True/False
-            message : string
-            coins : total number of coins (int)
-        }
-    '''
     user = await db.Users.find_one({"user_id" : params.user_id})
 
     if (params.timestamp - params.user_start_time) > timedelta(minutes= 30):
@@ -204,24 +197,25 @@ async def updateScore(
             "message" : "user submitted the question after the deadline",
             "coins" : user.get("coins")
         }
-    print(params.solved)
-    print(user.get("coins"))
     message = ""
     updated_coins = 0
     if params.solved != True:
+        print(params.solved)
         updated_coins = user.get("coins")-params.spent_amt
         message = f"the user lost {params.spent_amt} coins"
     else:
         updated_coins = user.get("coins") + params.spent_amt*(Winnings[params.difficulty])
         message = f"the user won {updated_coins - params.spent_amt} coins"
     print(updated_coins)
-    await db.Users.update_one(
-            {"user_id" : params.user_id},
-            {"$set":{"coins": updated_coins} }
-        )
+    update_doc = {
+        "$set": {"coins": updated_coins},
+        "$push": {"questions_attempted": {"question_id": params.question_id, "solved": params.solved}}
+    }
+
+    result = await db.Users.update_one({"user_id": params.user_id}, update_doc)
     return {
             "success" : True,
-            "message" : "user lost {params.spent_amt} coins",
+            "message" : message,
             "coins" : updated_coins
         }
 
