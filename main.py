@@ -1,5 +1,6 @@
 from fastapi import FastAPI, APIRouter, Depends,  Security, HTTPException, Request
 from fastapi.security.api_key import APIKeyHeader
+from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -23,6 +24,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 API_KEY = os.getenv("API_KEY")
 API_KEY_NAME = "API_KEY"
