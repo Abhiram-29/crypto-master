@@ -172,6 +172,7 @@ async def sendQuestions(
 
         for question in all_questions:
             question["status"] = "locked"
+            question["multiplier"] = 1.5
 
         result = await db.Users.update_one(
             {"user_id":user_id},
