@@ -138,20 +138,49 @@ class UserRequest(BaseModel):
 @limiter.limit("20/second")
 async def sendQuestions(
     request: Request,
-    question_request = UserRequest,
+    question_request : UserRequest,
     db: AsyncIOMotorDatabase = Depends(get_database),
     api_key : str = Depends(verifyApiKey)
 ):
+    user_id  = question_request.user_id
+    user = await db.Users.find_one({"user_id" : user_id})
+    if not user:
+        return {"success":"False","message":"User not found"}
+    
+    question_status = user.get("questions_generated")
+    print(question_status)
+    if question_status:
+        return {"success":"True","message":"questions retrieved successfully","questions":user.get("questions")}
+    else:
+        easy_questions = await db.Easy.find().to_list(length=None)
+        easy_questions = random.sample(
+            [serialize_document(q) for q in easy_questions], min(len(easy_questions), 10)
+        )  # 10 Easy
 
-    easy_questions = await db.Easy.find().to_list()
-    easy_questions = random.sample([serialize_document(q) for q in easy_questions],min(len(easy_questions),15))
-    medium_questions = await db.Medium.find().to_list()
-    medium_questions = random.sample([serialize_document(q) for q in medium_questions],min(len(medium_questions),15))
-    hard_questions = await db.Hard.find().to_list()
-    hard_questions = random.sample([serialize_document(q) for q in hard_questions],min(len(hard_questions),10))
+        medium_questions = await db.Medium.find().to_list(length=None)
+        medium_questions = random.sample(
+            [serialize_document(q) for q in medium_questions], min(len(medium_questions), 8)
+        )  # 8 Medium
 
-    questions = [*easy_questions,*medium_questions,*hard_questions]
-    return random.sample(questions,min(len(questions),30))
+        hard_questions = await db.Hard.find().to_list(length=None)
+        hard_questions = random.sample(
+            [serialize_document(q) for q in hard_questions], min(len(hard_questions), 5)
+        )  # 5 Hard
+
+        all_questions = easy_questions + medium_questions + hard_questions
+
+        for question in all_questions:
+            question["status"] = "locked"
+
+        result = await db.Users.update_one(
+            {"user_id":user_id},
+            {"$set":{
+                "questions_generated":True,
+                "questions":all_questions
+            }  }
+        )
+
+        return {"success":True,"message":"Questions generated successfully","questions":all_questions}
 
 @app.get("/")
 async def greet():
@@ -219,12 +248,28 @@ async def updateScore(
         updated_coins = user.get("coins") + params.spent_amt*(Winnings[params.difficulty])
         message = f"the user won {updated_coins - params.spent_amt} coins"
     print(updated_coins)
+    questions = user.get("questions")
+    print(params.question_id)
+    idx = -1
+    for i in range(len(questions)):
+        if questions[i].get("question_id")  == params.question_id:
+            print("question found")
+            print(params.solved == True)
+            idx = i
+            if params.solved:
+                questions[i]["status"] = "solved"
+            else:
+                questions[i]['status'] = "wrong answer"
+            break
+    print(idx)
+    print(questions[idx])
     update_doc = {
-        "$set": {"coins": updated_coins},
+        "$set": {"coins": updated_coins,"questions":questions},
         "$push": {"questions_attempted": {"question_id": params.question_id, "solved": params.solved}}
     }
 
     result = await db.Users.update_one({"user_id": params.user_id}, update_doc)
+    print(result)
     return {
             "success" : True,
             "message" : message,
