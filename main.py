@@ -190,7 +190,7 @@ async def login(
         else:
             message = "User has played the game"
             success = False
-    return {"success": success,"message": message,"name": user.get("name"),"email_id":user.get("email_id"),"coins":user.get("coins"),"time_left": 1500,"questions_attempted": user.get("questions_attempted")}
+    return {"success": success,"message": message,"user_id":user_id, "name": user.get("name"),"email_id":user.get("email_id"),"coins":user.get("coins"),"time_left": 1500,"questions_attempted": user.get("questions_attempted")}
 
 @app.post("/update")
 @limiter.limit("30/second")
