@@ -148,6 +148,7 @@ async def sendQuestions(
         return {"success":"False","message":"User not found"}
     
     question_status = user.get("questions_generated")
+    if question_status == "false": question_status = False
     print(question_status)
     if question_status:
         return {"success":"True","message":"questions retrieved successfully","questions":user.get("questions")}
