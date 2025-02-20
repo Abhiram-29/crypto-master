@@ -134,6 +134,11 @@ def serialize_document(doc):
 class UserRequest(BaseModel):
     user_id: str
 
+class startParameters(BaseModel):
+    user_id : str
+    question_id : int
+    bet_amt : int
+
 @app.post("/questions")
 @limiter.limit("20/second")
 async def sendQuestions(
@@ -173,6 +178,7 @@ async def sendQuestions(
         for question in all_questions:
             question["status"] = "locked"
             question["multiplier"] = 1.5
+            question["minimum_spend"] = 30
 
         result = await db.Users.update_one(
             {"user_id":user_id},
@@ -306,3 +312,37 @@ async def gameEnd(
     )
 
     return {"success" : True,"Final coin tally":user.get("coins")}
+
+
+@app.post("/questionStart")
+@limiter.limit("30/second")
+async def questionStart(
+    request : Request,
+    params : startParameters,
+    db : AsyncIOMotorDatabase = Depends(get_database),
+    api_key : str = Depends(verifyApiKey)
+):
+    user = await db.Users.find_one({"user_id" : params.user_id})
+    questions = user.get("questions")
+    coins = user.get("coins")
+    updated_coins = coins - params.bet_amt
+    if updated_coins < 0:
+        return {"success":False,"message":"Bet amount exceeded total number of coins available to the player","question_id":""}
+    found = False
+    for i in range(len(questions)):
+        if questions[i].get("question_id") == params.question_id:
+            questions[i]["status"] = "attempting"
+            found = True
+            break
+    if not found:
+        return {"success":False,"messasge":"Invalid question id","question_id":""}
+    
+    result = await db.Users.update_one(
+        {"user_id" : params.user_id},
+        {"$set" : {
+            "coins" : updated_coins,
+            "questions" : questions
+        } }
+    )
+
+    return {"success":True,"message":"user state updated","question_id":params.question_id}
