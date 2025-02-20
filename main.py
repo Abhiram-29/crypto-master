@@ -345,4 +345,4 @@ async def questionStart(
         } }
     )
 
-    return {"success":True,"message":"user state updated","question_id":params.question_id}
+    return {"success":True,"message":"user state updated","question_id":params.question_id,"updated_coins":updated_coins}
