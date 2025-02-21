@@ -37,7 +37,6 @@ API_KEY = os.getenv("API_KEY")
 API_KEY_NAME = "API_KEY"
 MONGO_URI = os.getenv("CONNECTION_STRING")
 Game_Duration = 30 #in minutes
-Winnings = {"easy": 0.20, "medium": 0.40, "hard": 0.80, "jackpot":2.00}
 
 
 api_key_header = APIKeyHeader(name=API_KEY_NAME,auto_error= True)
@@ -138,6 +137,7 @@ class startParameters(BaseModel):
     user_id : str
     question_id : int
     bet_amt : int
+    time_left : int
 
 @app.post("/questions")
 @limiter.limit("20/second")
@@ -210,24 +210,22 @@ async def login(
         return {"success" : False, "message":"User not found"}
     start_time = user.get("start_time")
     logged_in = user.get("logged_in")
-    if logged_in == "False":
+    time_left = user.get("time_left")
+    if logged_in == "False":logged_in = False
+    if not logged_in:
+        time_left = 1500
         await db.Users.update_one(
         {"user_id": user_id},
         {"$set": {
             "start_time": datetime.utcnow(),
-            "logged_in": "True",
-            "questions_attempted" : []
+            "logged_in": True,
+            "questions_attempted" : [],
+            "time_left" : 1500
         }},
         upsert=True
     )
         message = "User loggedin for the first time"
-    else:
-        if (datetime.utcnow()- start_time) < timedelta(minutes= Game_Duration):
-            message = "User logged in again"
-        else:
-            message = "User has played the game"
-            success = False
-    return {"success": success,"message": message,"user_id":user_id, "name": user.get("name"),"email_id":user.get("email_id"),"coins":user.get("coins"),"time_left": 1500,"questions_attempted": user.get("questions_attempted")}
+    return {"success": success,"message": message,"user_id":user_id, "name": user.get("name"),"email_id":user.get("email_id"),"coins":user.get("coins"),"time_left": time_left,"questions_attempted": user.get("questions_attempted")}
 
 @app.post("/update")
 @limiter.limit("30/second")
@@ -239,13 +237,6 @@ async def updateScore(
     api_key : str = Depends(verifyApiKey)
     ):
     user = await db.Users.find_one({"user_id" : params.user_id})
-
-    if (params.timestamp - params.user_start_time) > timedelta(minutes= 30):
-        return {
-            "success" : False,
-            "message" : "user submitted the question after the deadline",
-            "coins" : user.get("coins")
-        }
     message = ""
     updated_coins = 0
     if params.solved != True:
@@ -253,7 +244,7 @@ async def updateScore(
         updated_coins = user.get("coins")-params.spent_amt
         message = f"the user lost {params.spent_amt} coins"
     else:
-        updated_coins = user.get("coins") + params.spent_amt*(Winnings[params.difficulty])
+        updated_coins = user.get("coins") + params.spent_amt*params.multiplier
         message = f"the user won {updated_coins - params.spent_amt} coins"
     print(updated_coins)
     questions = user.get("questions")
@@ -269,15 +260,12 @@ async def updateScore(
             else:
                 questions[i]['status'] = "wrong answer"
             break
-    print(idx)
-    print(questions[idx])
     update_doc = {
-        "$set": {"coins": updated_coins,"questions":questions},
-        "$push": {"questions_attempted": {"question_id": params.question_id, "solved": params.solved}}
+        "$set": {"coins": updated_coins,"questions":questions,"time_left": params.time_left},
+        "$push": {"questions_attempted": {"question_id": params.question_id, "solved": params.solved}},
     }
 
     result = await db.Users.update_one({"user_id": params.user_id}, update_doc)
-    print(result)
     return {
             "success" : True,
             "message" : message,
@@ -323,6 +311,8 @@ async def questionStart(
     api_key : str = Depends(verifyApiKey)
 ):
     user = await db.Users.find_one({"user_id" : params.user_id})
+    if not user:
+        return {"success":False,"message":"The user does not exits","question_id":""}
     questions = user.get("questions")
     coins = user.get("coins")
     updated_coins = coins - params.bet_amt
@@ -341,8 +331,10 @@ async def questionStart(
         {"user_id" : params.user_id},
         {"$set" : {
             "coins" : updated_coins,
-            "questions" : questions
-        } }
+            "questions" : questions,
+            "time_left" : params.time_left
+        } },
+        upsert = True
     )
 
     return {"success":True,"message":"user state updated","question_id":params.question_id,"updated_coins":updated_coins}

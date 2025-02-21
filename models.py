@@ -41,10 +41,8 @@ class updateParameters(BaseModel):
     user_id : str
     question_id : int
     spent_amt : int
-    winning_amt : int
-    difficulty : str = Field(..., pattern="^(easy|medium|hard|jackpot)$")
-    timestamp : datetime
-    user_start_time : datetime
+    multiplier : float
+    time_left : int
     solved : bool
 
 class endParameters(BaseModel):
