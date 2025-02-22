@@ -1,5 +1,5 @@
 # main.py
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Security, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -13,32 +13,37 @@ import secrets
 from dotenv import load_dotenv
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
+from fastapi.security.api_key import APIKeyHeader
+from starlette.status import HTTP_403_FORBIDDEN
 
-load_dotenv("../.env")
 
-VALID_API_KEYS = set(os.getenv("API_KEYS","").split(','))
+VALID_API_KEYS = set(settings.API_KEY.split(','))
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 limiter = Limiter(key_func=get_remote_address)
 
-class APIKeyMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self,request: Request, call_next):
-        api_key = request.headers.get("API-Key")
+api_key_header = APIKeyHeader(name="API-Key", auto_error=False)
 
-        if not api_key or not any(secrets.compare_digest(api_key,key) for key in VALID_API_KEYS):
-            return JSONResponse(status_code=403,content={"detail":"Invalid API Key"})
-        
-        return await call_next(request)
+async def get_api_key(api_key: str = Security(api_key_header)):
+    if not api_key or not any(secrets.compare_digest(api_key, key) for key in VALID_API_KEYS):
+        logger.error(api_key)
+        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Invalid API Key")
+    return api_key
 
+app = FastAPI(dependencies=[Depends(get_api_key)])
 
-app = FastAPI()
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+class DocsBypassMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if request.url.path in ["/docs", "/openapi.json", "/redoc"]:
+            return await call_next(request)
+        return await call_next(request)
 
+app.add_middleware(DocsBypassMiddleware)
 app.add_middleware(
-    APIKeyMiddleware,
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
@@ -50,6 +55,7 @@ app.add_middleware(
 app.include_router(questions.router)
 app.include_router(users.router)
 app.include_router(leaderboard.router)
+app.include_router(gameControl.router)
 
 
 @app.on_event("startup")
@@ -61,7 +67,3 @@ async def startup_db():
 @app.on_event("shutdown")
 async def shutdown_db():
     await MongoDB.close()
-
-@app.get("/")
-async def greet():
-    return "API is running"

@@ -31,3 +31,8 @@ class LeaderBoard:
     @classmethod
     def showLeaderboard(cls):
         return cls.leader_board
+
+async def initialize_leaderboad():
+    db = await get_database()
+    users = await db.Users.find().to_list()
+    LeaderBoard.initialize_leaderboard(users)
