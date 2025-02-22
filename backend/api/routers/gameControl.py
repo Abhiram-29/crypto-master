@@ -21,10 +21,15 @@ async def game_end(
     db: AsyncIOMotorDatabase = Depends(get_database),
 ):
     user = await db.Users.find_one({"user_id": params.user_id})
+    if not user:
+        logger.error("Invalid user Id entered")
+        logger.error(params.user_id)
     LeaderBoard.update(params.user_id, user.get("coins"))
-    await db.Users.update_one(
+    result = await db.Users.update_one(
         {"user_id": params.user_id}, {"$set": {"end_time": datetime.utcnow()}}
     )
+    if not result.modified_count:
+        logger.error("Leaderboard was not updated")
 
     return {"success": True, "Final coin tally": user.get("coins")}
 
@@ -37,11 +42,13 @@ async def question_start(
 ):
     user = await db.Users.find_one({"user_id" : params.user_id})
     if not user:
+        logger.error(f"The user id {params.user_id} does not exist in the database")
         return {"success":False,"message":"The user does not exits","question_id":""}
     questions = user.get("questions")
     coins = user.get("coins")
     updated_coins = coins - params.bet_amt
     if updated_coins < 0:
+        logger.warning("Invalid bet amount recieved")
         return {"success":False,"message":"Bet amount exceeded total number of coins available to the player","question_id":""}
     found = False
     for i in range(len(questions)):
