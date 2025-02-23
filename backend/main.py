@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 limiter = Limiter(key_func=get_remote_address)
 
-api_key_header = APIKeyHeader(name="API-Key", auto_error=False)
+api_key_header = APIKeyHeader(name="API_KEY", auto_error=False)
 
 async def get_api_key(api_key: str = Security(api_key_header)):
     if not api_key or not any(secrets.compare_digest(api_key, key) for key in VALID_API_KEYS):
@@ -62,8 +62,10 @@ app.include_router(gameControl.router)
 async def startup_db():
     await MongoDB.connect()
     await initialize_leaderboard()
+    logger.info("Database connected successfully")
 
 
 @app.on_event("shutdown")
 async def shutdown_db():
     await MongoDB.close()
+    logger.info("Database disconnected")
