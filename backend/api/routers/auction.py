@@ -19,4 +19,6 @@ def auction(
     params: auctionParameters,
     db: AsyncIOMotorDatabase = Depends(get_database),
 ):
+    user_id = params.get("user_id")
+    user = await db.Users.find_one(user_id)
     

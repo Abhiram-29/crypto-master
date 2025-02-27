@@ -63,3 +63,8 @@ class auctionParameters(BaseModel):
     user_id : str
     jackpot_question_id : int
     jackpot_cost : int
+
+class createParams(BaseModel):
+    user_id : str
+    name : str
+    email_id : str
