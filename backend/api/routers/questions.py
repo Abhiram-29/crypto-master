@@ -56,6 +56,7 @@ async def send_questions(
 
         for question in all_questions:
             question["status"] = "locked"
+            question["question_image_url"] = question.get("question_image_url",None)
 
         result = await db.Users.update_one(
             {"user_id": user_id},
