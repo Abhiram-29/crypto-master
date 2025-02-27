@@ -75,7 +75,7 @@ async def update_score(
     updated_coins = 0
     if params.solved != True:
         logger.info(params.solved)
-        updated_coins = user.get("coins") - params.spent_amt
+        updated_coins = user.get("coins")
         message = f"the user lost {params.spent_amt} coins"
     else:
         updated_coins = user.get("coins") + params.spent_amt * params.multiplier

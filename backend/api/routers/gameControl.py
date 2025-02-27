@@ -46,6 +46,7 @@ async def question_start(
         return {"success":False,"message":"The user does not exits","question_id":""}
     questions = user.get("questions")
     coins = user.get("coins")
+    print(coins)
     updated_coins = coins - params.bet_amt
     if updated_coins < 0:
         logger.warning("Invalid bet amount recieved")
