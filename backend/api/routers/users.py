@@ -68,7 +68,9 @@ async def update_score(
     params: updateParameters,
     db: AsyncIOMotorDatabase = Depends(get_database),
 ):
+    print("Entered update")
     user = await db.Users.find_one({"user_id": params.user_id})
+    print("User fetch done")
     message = ""
     updated_coins = 0
     if params.solved != True:
@@ -92,6 +94,7 @@ async def update_score(
             else:
                 questions[i]["status"] = "wrong answer"
             break
+    print("Here done")
     update_doc = {
         "$set": {
             "coins": updated_coins,
@@ -107,4 +110,5 @@ async def update_score(
     }
 
     result = await db.Users.update_one({"user_id": params.user_id}, update_doc)
+    print(result)
     return {"success": True, "message": message, "coins": updated_coins}

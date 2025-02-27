@@ -58,3 +58,8 @@ class startParameters(BaseModel):
     question_id : int
     bet_amt : int
     time_left : int
+
+class auctionParameters(BaseModel):
+    user_id : str
+    jackpot_question_id : int
+    jackpot_cost : int
