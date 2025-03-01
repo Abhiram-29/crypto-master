@@ -42,7 +42,7 @@ class updateParameters(BaseModel):
     question_id : int
     spent_amt : int
     multiplier : float
-    time_left : int
+    time_left : float
     solved : bool
 
 class endParameters(BaseModel):
@@ -57,7 +57,7 @@ class startParameters(BaseModel):
     user_id : str
     question_id : int
     bet_amt : int
-    time_left : int
+    time_left : float
 
 class auctionParameters(BaseModel):
     user_id : str

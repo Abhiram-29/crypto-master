@@ -26,7 +26,7 @@ async def game_end(
         logger.error(params.user_id)
     LeaderBoard.update(params.user_id, user.get("coins"))
     result = await db.Users.update_one(
-        {"user_id": params.user_id}, {"$set": {"end_time": datetime.utcnow()}}
+        {"user_id": params.user_id}, {"$set": {"end_time": datetime.utcnow(), "time_left" : 0}}
     )
     if not result.modified_count:
         logger.error("Leaderboard was not updated")
