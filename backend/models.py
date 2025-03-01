@@ -40,7 +40,7 @@ class Wordle(BaseQuestion):
 class updateParameters(BaseModel):
     user_id : str
     question_id : int
-    spent_amt : int
+    spent_amt : float
     multiplier : float
     time_left : float
     solved : bool
@@ -48,7 +48,7 @@ class updateParameters(BaseModel):
 class endParameters(BaseModel):
     user_id : str
     end_time : datetime
-    coins : int
+    coins : float
 
 class UserRequest(BaseModel):
     user_id: str
@@ -56,13 +56,13 @@ class UserRequest(BaseModel):
 class startParameters(BaseModel):
     user_id : str
     question_id : int
-    bet_amt : int
+    bet_amt : float
     time_left : float
 
 class auctionParameters(BaseModel):
     user_id : str
-    jackpot_question_id : int
-    jackpot_cost : int
+    jackpot_question_id : float
+    jackpot_cost : float
 
 class createParams(BaseModel):
     user_id : str
