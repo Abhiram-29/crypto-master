@@ -68,3 +68,7 @@ class createParams(BaseModel):
     user_id : str
     name : str
     email_id : str
+
+class timeParams(BaseModel):
+    user_id : str
+    time_left : float

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from ..dependencies import get_database
-from models import UserRequest, updateParameters, endParameters, startParameters
+from models import UserRequest, updateParameters, endParameters, startParameters, timeParams
 from core.utils import LeaderBoard
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from datetime import datetime
@@ -71,3 +71,17 @@ async def question_start(
     )
 
     return {"success":True,"message":"user state updated","question_id":params.question_id,"updated_coins":updated_coins}
+
+@router.post("/updateTime")
+@limiter.limit("30/second")
+async def update_time(
+    request : Request,
+    params : timeParams,
+    db : AsyncIOMotorDatabase = Depends(get_database),
+):
+    result  = await  db.Users.update_one(
+        {"user_id" : params.user_id},
+        {"$set": {"time_left": params.time_left} }
+    )
+
+    return {"success" : True, "message" : "Time updated successfully"}
