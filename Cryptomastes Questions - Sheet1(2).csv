@@ -1,0 +1,114 @@
+question_id,Topic,Difficulty (Easy/Medium/Hard),question_type (fib/mcq/mcq_image),question,Question Image URL (for mcq_image),answer,option 1,option 2,option 3,option 4,multiplier,Comments
+1,Computer Networks,Medium,mcq,An administrator wants to prevent unauthorized devices from connecting to the network. Which security control is best suited for this purpose?,,2,IDS,NAC,VPN,SIEM,1.6,we can reduce difficulty by keeping full forms instead of abbreviations
+2,Cybersecurity,Hard,mcq,Which type of malware is specifically designed to provide persistent unauthorized access to a system?,,1,Rootkit,worm,Trojan ,Ransomware,1.8,
+3,Cybersecurity,Medium,mcq,A company implements a policy where employees can only access systems necessary for their specific job roles. What principle is being applied?,,4, Separation of Duties,Job Rotation,Mandatory Access Control,Least Privilege,1.5,
+5,Data structures,easy,mcq,"Consider the following operations on an initially empty stack:
+
+• Push 10
+
+• Push 20
+
+• Pop
+
+• Push 30
+
+• Pop
+
+• Push 40
+
+What is the final content of the stack?
+
+",,1,"10, 40
+
+","40, 20","40, 10","30, 40",1.2,
+6,Maths,medium,mcq,"
+The product of all eigenvalues of the matrix
+is:
+",https://i.ibb.co/8nWhNyfz/Screenshot-2025-02-27-104916.png,2,-1,0,1,2,1.5,
+8,Probability(math),medium,fib," A bag contains 10 red balls and 15 blue balls. Two balls are drawn randomly without replacement. Given that the first ball drawn is red, the probability (rounded off to 3 decimal places) that both balls drawn are red is ____.",,0.15,,,,,1.6,
+9,Data structures,medium,fib," Let A be an array containing integer values. The distance of A is defined as the mini- mum number of elements in A that must be replaced with another integer so that the re- sulting array is sorted in non-decreasing order. The distance of the array [2, 5, 3, 1, 4, 2, 6]
+is",,3,,,,,1.6,
+10,Data structures,easy,mcq,Which of the following is true about the binary search algorithm when applied to a sorted array?,,3, It always has a time complexity of O(n), It works on unsorted arrays, It divides the search space into two equal halves on each iteration,It requires that the array be sorted in descending order,1.2,
+11,Math,medium,mcq,"If two distinct non-zero real variables x and y are such that (x + y) is proportional to (xy), then the value of x/y is:",,4,depends on xy,depends only on x and not on y,depends only on y and not on x,is a constant,1.5,
+12,Math,medium,mcq,"For positive non-zero real variables p and q, if
+
+",https://i.ibb.co/WWXZzwGL/Screenshot-2025-02-27-at-11-40-16-AM.png,1,79,81,9,83,1.6,
+13, programming/code,easy,mcq,"Consider the following C program:
+Which one of the following statements is CORRECT?
+",https://i.ibb.co/SX10gMyB/Screenshot-2025-02-27-at-11-58-21-AM.png,3,The program prints 9 as output.,The program prints 10 as output.,The program gets stuck in an infinite loop.,The program prints 6 as output.,1.3,
+14, programming/code,easy,mcq,"Consider the following code:
+
+What is the output?
+",https://i.ibb.co/LyKb040/Screenshot-2025-02-27-at-11-43-36-AM.png,1,21,105,126,0,1.3,
+15,Math(Numerical methods),medium,mcq,"Let T(n) be the recurrence relation defined as follows:
+Which one of the following statements is TRUE?",https://i.ibb.co/zVWtzLHy/Screenshot-2025-02-27-at-11-47-16-AM.png,1,T (n) = 0(2^n),T (n) = 0(n*2^n),T (n) = 0(3^n),T (n) = 0(n*3^n),1.6,
+16, programming/code,medium,mcq,"What is the output of the following C program?
+
+",https://i.ibb.co/hNKXNCM/Screenshot-2025-02-27-at-11-48-13-AM.png,2,"4,8","1,5","8,5","1,8",1.6,
+17,Math,easy,mcq,"Given the matrix
+",https://i.ibb.co/JW7rdDG4/Screenshot-2025-02-27-at-11-49-22-AM.png,1,625I,625A,I,25I,1.2,
+18, programming/code,medium,mcq,"Consider the following C code:
+
+What is the output?
+",https://i.ibb.co/PGGMnFB0/Screenshot-2025-02-27-at-11-53-27-AM.png,2,40,46,50,30,1.5,
+19,Data structures,easy,mcq,"What is the time complexity of the following algorithm?
+",https://i.ibb.co/S4VVNgBW/Screenshot-2025-02-27-at-11-56-37-AM.png,2,O(n),O(n^2),O(n^3),O(logn),1.2,
+20,discrete mathematics,easy,fib,"The chromatic number of a graph is the minimum number of colours used in a proper colouring of the graph. The chromatic number of the following graph is
+",https://i.ibb.co/XfxPdNF7/Screenshot-2025-02-27-at-11-50-43-AM.png,2,,,,,1.2,
+21, programming/code,medium,fib,"What is the output of the following C code?
+",https://i.ibb.co/Zpdr2qfw/Screenshot-2025-02-27-at-11-54-26-AM.png,25,,,,,1.6,
+22,operating systems,hard,mcq,"Consider the folowing process information for shortest remaining time first(SRTF) Scheduling:
+
+
+Find the turnariund time for each process",https://i.ibb.co/prrnSs9k/Screenshot-2025-02-27-at-11-42-15-AM.png,1,19,20,18,15,1.9,
+23,Math,Easy,mcq,"Find the missing number in the series: 2, 6, 12, 20, 30, ?",,2,40,42,48,56,1.3,
+24,Math,Medium,mcq,"A series of natural numbers F1, F2, F3, F4, F5, F6, F7, … obeys Fn+1 = Fn + Fn-1 for all integers n ≥ 2. If F6 = 37, and F7 = 60, then what is F1?",,1,4,5,8,9,1.5,
+25,Math,Easy ,mcq,"Looking at the surface of a smooth 3-dimensional object from the outside, which one of the following options is TRUE?",,3,The surface of the object must be convex everywhere.,The surface of the object must be concave everywhere.,The surface of the object may be concave in some places and convex in other places.,"The object can have edges, but no corners.",1.2,
+26,Data Structures,hard,mcq,"Which one of the following sequences when stored in an array at locations A[1],…,A[10] forms a max-heap?",,1,"23, 17, 14, 7, 13, 10, 1, 5, 6, 12","23, 17, 10, 6, 13, 14, 1, 5, 7, 12","23, 17, 14, 7, 13, 10, 1, 5, 6, 12","23, 14, 17, 1, 10, 13, 16, 12, 7, 5",1.9,
+27,Operating Systems,easy,mcq,Which one or more of the following CPU scheduling algorithms can potentially cause starvation?,,1,Priority Scheduling,First-in First-Out,Round Robin,NONE,1.2,
+28,Data Structures,medium,fib,"Consider a sequence a of elements a0 = 1, a1 = 5, a2 = 7, a3 = 8, a4 = 9, and a5 = 2. The following operations are performed on a stack S and a queue Q, both of which are initially empty: I: push the elements of a from a0 to a5 in that order into S. II: enqueue the elements of a from a0 to a5 in that order into Q. III: pop an element from S. IV: dequeue an element from Q. V: pop an element from S. VI: dequeue an element from Q. VII: dequeue an element from Q and push the same element into S. VIII: Repeat operation VII three times. IX: pop an element from S. X: pop an element from S. The top element of S after executing the above operations is:",,8,,,,,1.6,
+29,Probability/Math,medium,mcq,"A box contains 5 red, 4 blue, and 3 green balls. If two balls are drawn at random, what is the probability that both are red?",,2,5/33,10/33,5/22,1/6,1.6,
+30,Math,easy,fib,"A & B complete a task in 12 days, B & C in 15 days, and C & A in 20 days. How long will it take for A, B, and C together to complete the work?",,8,,,,,1.3,
+31,Logic/Puzzles,Easy,mcq,"A farmer needs to cross a river with a wolf, a goat, and a cabbage. He can only carry one at a time. How does he do it safely?",,1,Take the goat first,Take the wolf first ,Take the cabbage first ,Take the wolf and cabbage together,1.3,
+32,Logic/Puzzles,Medium,mcq,"A chessboard has an infinite number of squares. A knight starts at (0,0) and moves normally. Can it visit every possible square at least once?",,1,yes,no,Only if it moves randomly,Only if it starts at an odd coordinate,1.5,
+33,Math,Easy,fib,A clock shows 3:15. What is the angle between the hour and minute hand?,,7.5,,,,,1.2,
+34,Logic/Puzzles,medium,mcq,"100 prisoners stand in a line, each wearing a hat that is either black or white. They can see the hats of the prisoners in front but not their own. They must guess their hat color in order. If at least 99 prisoners guess correctly, what strategy do they use?",,2,Random guessing,Counting odd/even black hats ahead,Whispering hints,No possible strategy,1.6,
+35,Logic/Puzzles,medium,mcq,100 prisoners enter a room one by one. Inside is a lightbulb that starts off. Each prisoner may flip it. The prisoners win if all 100 can be certain they’ve entered. They cannot communicate after entering. What’s the best strategy?,,2,Each prisoner flips randomly,A leader counts flips,Each prisoner flips only once,No strategy guarantees success,1.6,
+36,Logic/Puzzles,medium,mcq,"100 prisoners stand in a line, each wearing a randomly assigned red or blue hat. They can only see the hats of those in front. The first person in line must guess their own hat color; if they’re wrong, they die. The others hear previous guesses. What strategy ensures at least 99 survive?",,2,Everyone guesses randomly,The first person says “red” if they see an even number of red hats,The first person always says “blue”,No strategy can guarantee this,1.6,
+37,Math,easy,fib,Find x: x + 1/x = 3. What is x³ + 1/x³?,,18,,,,,1.2,
+38,Logic/Puzzles,Easy,mcq,"A professor writes two messages: 1) “The other message is true.” 2) “The first message is false.” Are they both true, both false, or one true and one false?",,4,Both true,Both False,One true and one false ,Undefined,1.3,
+39,Physics/Math,Easy,mcq,A log is floating down an infinitely long river at 2 m/s. You are running at 4 m/s on land. The river is 10m wide. What’s the fastest way to cross?,,2,Swim straight across,Swim diagonally upstream,"Swim downstream, then cross",Run along the bank and jump,1.3,
+40,Cybersecurity,Medium,mcq,What is a common technique used in spear-phishing attacks?,,2,Sending mass emails with generic messages,Using personalized information gathered from OSINT,Exploiting software vulnerabilities to gain remote access,Encrypting files and demanding a ransom,1.5,
+41,Cybersecurity,Medium,mcq,Which of the following is the most effective way to prevent Business Email Compromise (BEC)?,,3,Relying on spam filters to detect fraudulent emails,Using only antivirus software on corporate devices,"Implementing email verification measures such as DMARC, SPF, and DKIM",Changing employee passwords every 6 months,1.5,
+42,Cybersecurity,Medium,mcq,What is a potential risk of paying a ransomware attacker?,,4,The attacker may increase the ransom demand after payment,The company may face legal consequences for funding cybercrime,The decrypted files may still be damaged or incomplete,All of the above,1.5,
+43,Cybersecurity,Medium,mcq,Which of the following is commonly sold on dark web marketplaces?,,4,Stolen credit card data,Malware-as-a-Service (MaaS) tools,Exploits and zero-day vulnerabilities,All of the above,1.5,
+44,Cybersecurity,Medium,mcq,What is a key indicator of a potential insider threat?,,1,An employee frequently requests access to sensitive files unrelated to their job,An employee forgets their login credentials multiple times,An employee installs an additional antivirus program on their work device,An employee frequently works late hours at the office,1.5,
+45,Cybersecurity,Medium,mcq,Which method is commonly used by cybercriminals to bypass Multi-Factor Authentication (MFA)?,,2,Brute-force password guessing,SIM swapping to hijack OTP messages,Using keyloggers to steal credentials,Sending phishing emails with fake login pages,1.6,
+46,Cybersecurity,easy,mcq,What is the main goal of a SIM swapping attack?,,3,To gain access to a victim’s phone call history,To steal personal photos from a victim’s phone,To intercept SMS-based authentication codes for account takeover,To disable a victim’s internet connection,1.2,
+47,Cybersecurity,easy,mcq,Which cybercrime technique involves the use of AI-generated deepfake videos or audio?,,2,Credential stuffing,Voice phishing (vishing) and CEO fraud,SQL injection attacks,Ransomware encryption,1.2,
+48,Cybersecurity,easy,mcq,Which law in the United States is primarily used to prosecute hackers and cybercriminals?,,2,GDPR (General Data Protection Regulation),CFAA (Computer Fraud and Abuse Act),DMCA (Digital Millennium Copyright Act),CCPA (California Consumer Privacy Act),1.3,
+49,Cybersecurity,easy,mcq,Why do cybercriminals prefer cryptocurrency for illicit transactions?,,3,Transactions are completely anonymous and untraceable,Cryptocurrencies can be easily converted into physical cash,"Blockchain transactions are irreversible, making it difficult for victims to recover funds",Authorities cannot monitor any cryptocurrency transactions,1.3,
+50,Cybersecurity,easy,mcq,"You receive an email claiming to be from your bank, asking you to click a link and enter your login details. What should you do?",,3,Click the link and enter your information quickly to secure your account,Ignore the email since banks never send emails,Verify the sender’s email address and contact your bank directly to confirm,Reply to the email asking for proof that they are legitimate,1.2,
+51,Cybersecurity,easy,mcq,Which of the following is the safest way to create a strong password?,,2,Use your birthday or pet’s name so you can remember it easily,"Use a mix of uppercase, lowercase, numbers, and symbols (e.g., P@ssw0rd!3x)",Use the same password for all your accounts so it’s easy to remember,Write your password down on paper and keep it near your computer,1.2,
+52,Cybersecurity,easy,mcq,What is the best way to protect yourself when using public Wi-Fi at a café or airport?,,1,Use a VPN (Virtual Private Network) to encrypt your internet connection,Always connect to the Wi-Fi with the strongest signal,Enter your credit card details only on secure websites,Ask an employee for the official Wi-Fi and use it without worry,1.2,
+53,Cybersecurity,easy,mcq,What should you do if your computer is locked by ransomware demanding payment?,,3,Pay the ransom immediately to recover your files,Restart your computer and hope the problem goes away,Contact a cybersecurity professional and report the attack,Delete all your files and reinstall the operating system,1.4,
+54,Cybersecurity,easy,mcq,Why is enabling Two-Factor Authentication (2FA) important for online accounts?,,2,It helps recover your account if you forget your password,It adds an extra layer of security by requiring a second verification step,It makes logging in faster and easier,It prevents your device from getting viruses,1.4,
+55,Cybersecurity,easy,mcq,"If someone calls you pretending to be from a government agency and demands immediate payment or personal information, what should you do?",,2,Provide the requested details to avoid legal trouble,Hang up and verify their identity by contacting the agency directly,Argue with the caller and demand proof of their identity,Call them back using the number they provided,1.2,
+56,Cybersecurity,easy,mcq,Which of the following is a warning sign that an online shopping website might be a scam?,,4,Prices are significantly lower than other websites,"The website does not have an ""HTTPS"" padlock in the address bar",There are no customer reviews or contact details available,All of the above,1.3,
+57,Cybersecurity,easy,mcq,Which personal information should you never share publicly on social media?,,2,Your favorite movie,Your full name and date of birth,A picture of your pet,Your opinion on the latest TV show,1.2,
+58,Cybersecurity,easy,mcq,"A pop-up appears on your screen saying, ""Your computer is infected! Click here to fix it!"" What should you do?",,2,Click the link and follow the instructions to remove the virus,Close the pop-up and run a security scan using legitimate antivirus software,Restart your computer and ignore the warning,Call the phone number in the pop-up for technical support,1.4,
+59,Cybersecurity,easy,mcq,Which of the following actions is illegal and considered a cybercrime?,,2,Using a friend’s Netflix password with their permission,Hacking into someone’s social media account without their consent,Taking a screenshot of a public website,Posting a negative review about a product online,1.2,
+60,Cybersecurity,hard,mcq,You are a network administrator and need to subnet the IP range 192.168.50.0/24 into at least 6 subnets while maximizing the number of usable host addresses per subnet. Which of the following subnet masks should you use?,,1,255.255.255.224,255.255.255.192,255.255.255.240,255.255.255.248,1.8,
+61,Cybersecurity,hard,mcq,Which of the following hashing algorithms is the most vulnerable to a collision attack?,,2,SHA-256,SHA-1,Bcrypt,Argon2,1.9,
+62,Cybersecurity,hard,mcq,"A forensic investigator wants to identify a suspicious process running as root.
+
+Which command provides detailed information about the process?",,1,ps aux | grep root,kill -9 1,ls -l /root,chmod 777 /etc/passwd,1.9,
+63,Cybersecurity,hard,mcq,"You suspect that a hacker accessed the machine.
+
+Which command shows the last logins?",,1,last,history,netstat -an,chmod -R 777 /var/log,1.9,
+64,Cybersecurity,hard,mcq,Which of the following is the best way to verify that a downloaded file has not been tampered with?,,3,Checking the file name,Running the file in a sandbox environment,"Verifying the cryptographic hash (e.g., SHA-256)",Scanning the file with an antivirus,1.9,
+65,Cybersecurity,medium,mcq,An attacker successfully gains access to a company's network by sending a phishing email to an employee. What type of vulnerability is primarily exploited in this case?,,2,Software vulnerability,Human vulnerability,Network misconfiguration,Brute-force attack,1.5,
+66,Cybersecurity,hard,mcq,"A cybersecurity analyst notices that users are being redirected to a fake banking website despite entering the correct URL. However, the bank’s real website is secure with HTTPS. What is the most likely cause?",,2,The attacker exploited a vulnerability in the bank’s website,A Man-in-the-Middle (MITM) attack modified DNS responses,Users accidentally mistyped the website address,The attacker used SQL injection to change the database,1.8,
+67,Cybersecurity,hard,mcq,"A developer is testing a web application on their local machine. However, they can access it using localhost, but not with 127.0.0.1. What could be the problem?",,2,The firewall is blocking external connections,The application is listening on [::1],The network adapter is disconnected,The application is not running,1.9,
+68,Data Structures,medium,mcq,"Given an array A[n] such that:                   Find the time complexity to find A[i].
+",https://ibb.co/xqy1q98S,3,O(N),O(log₂ N),O(log n × log n),O(1),1.6,
