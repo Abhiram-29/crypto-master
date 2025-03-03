@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from ..dependencies import get_database
-from models import createParams, UserRequest
+from models import createParams, UserRequest, coinParams
 from core.utils import serialize_document
 from motor.motor_asyncio import AsyncIOMotorDatabase
 import random
@@ -15,12 +15,12 @@ router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
 
 @router.post("/user_reset")
-def userReset(
+async def userReset(
     request : Request,
     params : UserRequest,
     db: AsyncIOMotorDatabase = Depends(get_database),
 ):
-    db.Users.update_one(
+    result = await db.Users.update_one(
         {"user_id" : params.user_id},
         {"$set" : {
             "coins" : 500,
@@ -31,12 +31,12 @@ def userReset(
     return {"success" : True, "message" : "User reset successfully"}
 
 @router.post("/user_create")
-def createUser(
+async def createUser(
     request: Request,
     params : createParams,
     db: AsyncIOMotorDatabase = Depends(get_database),
 ):
-    db.Users.insert_one({
+    result = await db.Users.insert_one({
         "user_id": params.user_id,
         "name": params.name,
         "email_id": params.email_id,
@@ -50,3 +50,21 @@ def createUser(
         "questions_generated": False
     })
     return {"success" : True, "message" : "User created successfully"}
+
+@router.post("/coin_update")
+async def updateCoins(
+    request : Request,
+    params : coinParams,
+    db : AsyncIOMotorDatabase = Depends(get_database)
+):
+    user = await db.Users.find_one({"user_id" : params.user_id})
+
+    if not user:
+        return {"success": False, "message": "User not found in the database"}
+    updated_coins = user.get("coins")+params.coins
+    result = db.Users.update_one(
+        {"user_id": params.user_id},
+        {"$set":{"coins" : updated_coins} }
+    )
+    msg = f"The users coins were updated successfully, new balance of {params.user_id} is {updated_coins}"
+    return {"success": True, "message": msg }

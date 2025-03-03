@@ -33,31 +33,31 @@ class LeaderBoard:
     def showLeaderboard(cls):
         return cls.leader_board
 
-@classmethod
-def initialize_leaderboard(cls, users):
-    cls.leader_board = []
-    
-    for user in users:
-        coins = user.get("coins")
-        user_id = user.get("user_id")
+    @classmethod
+    def initialize_leaderboard(cls, users):
+        cls.leader_board = []
+        
+        for user in users:
+            coins = user.get("coins")
+            user_id = user.get("user_id")
 
-        # Debugging print statements
-        print(f"User: {user}, Coins: {coins}, User ID: {user_id}")
+            # Debugging print statements
+            print(f"User: {user}, Coins: {coins}, User ID: {user_id}")
 
-        # Ensure coins is a number, default to 0 if None or invalid
-        if not isinstance(coins, (int, float)):
-            print(f"Invalid coins value: {coins} for user {user_id}, setting to 0")
-            coins = 0  
+            # Ensure coins is a number, default to 0 if None or invalid
+            if not isinstance(coins, (int, float)):
+                print(f"Invalid coins value: {coins} for user {user_id}, setting to 0")
+                coins = 0  
 
-        cls.leader_board.append((coins, user_id))
+            cls.leader_board.append((coins, user_id))
 
-    # Debugging: Print before sorting
-    print("Before sorting:", cls.leader_board)
+        # Debugging: Print before sorting
+        print("Before sorting:", cls.leader_board)
 
-    try:
-        cls.leader_board.sort(key=lambda x: x[0])
-    except Exception as e:
-        print("Sorting error:", e, "Leaderboard content:", cls.leader_board)
-    
-    print("After sorting:", cls.leader_board)
+        try:
+            cls.leader_board.sort(key=lambda x: -x[0])
+        except Exception as e:
+            print("Sorting error:", e, "Leaderboard content:", cls.leader_board)
+        
+        print("After sorting:", cls.leader_board)
 

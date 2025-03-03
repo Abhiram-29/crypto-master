@@ -72,3 +72,7 @@ class createParams(BaseModel):
 class timeParams(BaseModel):
     user_id : str
     time_left : float
+
+class coinParams(BaseModel):
+    user_id : str
+    coins : float

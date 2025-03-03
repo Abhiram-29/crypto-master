@@ -5,7 +5,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from core.database import MongoDB, initialize_leaderboard
-from api.routers import questions, users, gameControl, admin
+from api.routers import questions, users, gameControl, admin, leaderboard
 from core.config import settings
 import logging
 import os
@@ -56,6 +56,7 @@ app.include_router(questions.router)
 app.include_router(users.router)
 app.include_router(gameControl.router)
 app.include_router(admin.router)
+app.include_router(leaderboard.router)
 
 @app.on_event("startup")
 async def startup_db():
