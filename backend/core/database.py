@@ -1,7 +1,6 @@
 # core/database.py
 from motor.motor_asyncio import AsyncIOMotorClient
 from .config import settings
-from .utils import LeaderBoard  # Import LeaderBoard
 
 class MongoDB:
     client: AsyncIOMotorClient = None
@@ -24,7 +23,3 @@ async def get_database():  # Keep this for dependency injection
         await MongoDB.connect()
     return MongoDB.db
 
-async def initialize_leaderboard():
-    db = await get_database()
-    users = await db.Users.find().to_list(length=None)
-    LeaderBoard.initialize_leaderboard(users)
